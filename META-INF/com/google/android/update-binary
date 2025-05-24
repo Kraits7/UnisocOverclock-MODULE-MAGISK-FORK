@@ -1,0 +1,39 @@
+#!/sbin/sh
+
+OUTFD=$2
+ZIPFILE=$3
+
+ui_print() {
+  echo -e "ui_print $1\nui_print" > /proc/self/fd/$OUTFD
+}
+
+ui_print "**********************************"
+ui_print " UNISOC EXTREME OVERCLOCK MODULE  "
+ui_print "   MAXIMUM POWER ACTIVATION!      "
+ui_print "**********************************"
+
+# Mount system
+mount /system 2>/dev/null
+mount -o rw,remount /system 2>/dev/null
+mount -o rw,remount / 2>/dev/null
+
+# Extract files
+ui_print "- Extracting files..."
+unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
+
+# Set permissions
+ui_print "- Setting permissions..."
+set_perm_recursive $MODPATH 0 0 0755 0644
+set_perm $MODPATH/system/bin/unisoc_ocd 0 0 0755
+
+# Additional safety checks
+ui_print "- Checking device compatibility..."
+if ! grep -q "ums8230" /proc/cpuinfo && ! grep -q "ums512" /proc/cpuinfo; then
+  ui_print "! WARNING: Unsupported chipset detected!"
+  ui_print "! Proceeding may damage your device!"
+fi
+
+# Finalize
+ui_print "- Installation complete!"
+ui_print "! REBOOT TO ACTIVATE EXTREME POWER !"
+ui_print "! USE THERMAL MONITORING TOOL !"
