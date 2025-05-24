@@ -1,0 +1,57 @@
+#!/system/bin/sh
+# UNISOC Extreme OC Init.d Script
+# Runs at late_start service (after boot completes)
+
+MODDIR=${0%/*}
+LOG_FILE="/data/unisoc_oc.log"
+
+# Wait for system stabilization
+sleep 30
+
+# Logging header
+echo "=================================" > $LOG_FILE
+echo "UNISOC EXTREME OC BOOT INIT" >> $LOG_FILE
+echo "Date: $(date)" >> $LOG_FILE
+echo "=================================" >> $LOG_FILE
+
+# 1. REAPPLY CORE SETTINGS
+sh $MODDIR/common/post-fs-data.sh >> $LOG_FILE 2>&1
+
+# 2. CPU TWEAKS
+echo "Applying CPU Tweaks..." >> $LOG_FILE
+for cpu in /sys/devices/system/cpu/cpu*/cpufreq
+do
+    # Force performance governor
+    echo performance > $cpu/scaling_governor 2>> $LOG_FILE
+    
+    # Lock frequencies (prevent system interference)
+    echo 1 > $cpu/scaling_min_lock 2>> $LOG_FILE
+    echo 1 > $cpu/scaling_max_lock 2>> $LOG_FILE
+    
+    # Disable frequency scaling
+    echo 0 > $cpu/scaling_governor 2>> $LOG_FILE
+done
+
+# 3. GPU ULTRA BOOST (if available)
+if [ -f /sys/class/kgsl/kgsl-3d0/devfreq/max_freq ]; then
+    echo "Applying GPU Boost..." >> $LOG_FILE
+    echo 900000000 > /sys/class/kgsl/kgsl-3d0/devfreq/max_freq 2>> $LOG_FILE
+    echo 900000000 > /sys/class/kgsl/kgsl-3d0/devfreq/min_freq 2>> $LOG_FILE
+fi
+
+# 4. THERMAL OVERRIDE (DANGER ZONE)
+echo "Modifying Thermal Settings..." >> $LOG_FILE
+for thermal in /sys/class/thermal/thermal_zone*
+do
+    echo 95000 > $thermal/trip_point_1_temp 2>> $LOG_FILE
+    echo 1 > $thermal/mode 2>> $LOG_FILE
+done
+
+# 5. LAUNCH MONITORING DAEMON
+echo "Starting OCD Daemon..." >> $LOG_FILE
+nohup $MODDIR/system/bin/unisoc_ocd >> $LOG_FILE 2>&1 &
+
+# Finalization
+echo "Boot Initialization Complete" >> $LOG_FILE
+echo "Last CPU Freq: $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)" >> $LOG_FILE
+echo "Current Temp: $(cat /sys/class/thermal/thermal_zone0/temp)" >> $LOG_FILE
