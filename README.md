@@ -1,6 +1,6 @@
 # 🔥 Unisoc Extreme Overclock Magisk Module 🔥
 
-**Warning:** This module pushes your Unisoc UMS8230/UMS512 to its absolute limits! Use at your own risk!
+**Warning:** This module pushes your Unisoc UMS9230/UMS512 to its absolute limits! Use at your own risk!
 
 ## 📌 Features
 - **CPU Overclocking** up to 2.3GHz (from stock 1.5GHz)
