@@ -1,3 +1,6 @@
-# vTest
+# v1.0
 
-- This test changelog.
+- ZRAM.
+- Removing non-working functions.
+- Fix bootloop.
+- Speed ​​up application launches.
