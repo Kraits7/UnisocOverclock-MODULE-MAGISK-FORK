@@ -6,5 +6,5 @@ debug.egl.hw=1
 debug.sf.hw=1
 persist.sys.ui.hw=1
 ro.config.hw_fast_dormancy=1
-ro.vendor.gpu.boost=5
-ro.config.hw_quickpoweron=true|
+ro.vendor.gpu.boost=2
+ro.config.hw_quickpoweron=true
