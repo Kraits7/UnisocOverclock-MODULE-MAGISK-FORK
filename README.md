@@ -1,4 +1,4 @@
-# 🔥 Unisoc Extreme Overclock Magisk Module Fork 🔥
+# Unisoc Extreme Overclock Magisk Module Fork 
 
 **Warning:** This module just fix original version
 
